@@ -42,13 +42,8 @@ abstract final class ThemeUtils {
               labelMedium: textStyle,
               labelSmall: textStyle,
             ),
-      tabBarTheme:
-          fontWeight == null ? null : TabBarThemeData(labelStyle: textStyle),
       appBarTheme: AppBarTheme(
         elevation: 0,
-        titleSpacing: 0,
-        centerTitle: false,
-        scrolledUnderElevation: 0,
         backgroundColor: colorScheme.surface,
         titleTextStyle: TextStyle(
           fontSize: 16,
@@ -56,65 +51,18 @@ abstract final class ThemeUtils {
           fontWeight: fontWeight,
         ),
       ),
-      navigationBarTheme: NavigationBarThemeData(
-        surfaceTintColor: isDynamic ? colorScheme.onSurfaceVariant : null,
-      ),
-      snackBarTheme: SnackBarThemeData(
-        actionTextColor: colorScheme.primary,
-        backgroundColor: colorScheme.secondaryContainer,
-        closeIconColor: colorScheme.secondary,
-        contentTextStyle:
-            TextStyle(color: colorScheme.onSecondaryContainer),
-        elevation: 20,
-      ),
-      popupMenuTheme: PopupMenuThemeData(
-        surfaceTintColor: isDynamic ? colorScheme.onSurfaceVariant : null,
-      ),
       cardTheme: CardThemeData(
         elevation: 1,
         margin: EdgeInsets.zero,
         shadowColor: Colors.transparent,
-        surfaceTintColor: isDynamic ? colorScheme.onSurfaceVariant : null,
-      ),
-      progressIndicatorTheme: ProgressIndicatorThemeData(
-        year2023: false,
-        refreshBackgroundColor: colorScheme.onSecondary,
       ),
       dialogTheme: DialogThemeData(
-        titleTextStyle: TextStyle(
-          fontSize: 18,
-          color: colorScheme.onSurface,
-          fontWeight: fontWeight,
-        ),
         backgroundColor: colorScheme.surface,
-        constraints: const BoxConstraints(minWidth: 280, maxWidth: 420),
       ),
       bottomSheetTheme: BottomSheetThemeData(
         backgroundColor: colorScheme.surface,
         shape: const RoundedRectangleBorder(
           borderRadius: StyleString.bottomSheetRadius,
-        ),
-      ),
-      sliderTheme: const SliderThemeData(year2023: false),
-      tooltipTheme: TooltipThemeData(
-        textStyle: const TextStyle(
-          color: Colors.white,
-          fontSize: 14,
-        ),
-        decoration: BoxDecoration(
-          color: Colors.grey[700]!.withValues(alpha: 0.9),
-          borderRadius: const BorderRadius.all(Radius.circular(4)),
-        ),
-      ),
-      cupertinoOverrideTheme: CupertinoThemeData(
-        selectionHandleColor: colorScheme.primary,
-      ),
-      switchTheme: const SwitchThemeData(
-        thumbIcon: WidgetStateProperty<Icon?>.fromMap(
-          <WidgetStatesConstraint, Icon?>{
-            WidgetState.selected: Icon(Icons.done),
-            WidgetState.any: null,
-          },
         ),
       ),
       pageTransitionsTheme: const PageTransitionsTheme(
@@ -125,20 +73,32 @@ abstract final class ThemeUtils {
     );
 
     if (isDark) {
-      const darkBg = Color(0xFF17181A);
+      const bg = Color(0xFF17181A);
 
       themeData = themeData.copyWith(
+        scaffoldBackgroundColor: bg,
+        appBarTheme: themeData.appBarTheme.copyWith(
+          backgroundColor: bg,
+        ),
+        dialogTheme: themeData.dialogTheme.copyWith(
+          backgroundColor: bg,
+        ),
+        bottomSheetTheme: themeData.bottomSheetTheme.copyWith(
+          backgroundColor: bg,
+        ),
+        cardTheme: themeData.cardTheme.copyWith(
+          color: const Color(0xFF1E1F22),
+        ),
         navigationBarTheme: NavigationBarThemeData(
-          backgroundColor: darkBg,
+          backgroundColor: bg,
           surfaceTintColor: Colors.transparent,
           indicatorColor:
-              themeData.colorScheme.primary.withOpacity(0.15),
+              themeData.colorScheme.primary.withOpacity(0.18),
           labelTextStyle: WidgetStateProperty.resolveWith(
             (states) {
               if (states.contains(WidgetState.selected)) {
                 return TextStyle(
                   color: themeData.colorScheme.primary,
-                  fontWeight: FontWeight.w500,
                 );
               }
               return const TextStyle(
@@ -158,6 +118,15 @@ abstract final class ThemeUtils {
               );
             },
           ),
+        ),
+        colorScheme: themeData.colorScheme.copyWith(
+          surface: bg,
+          background: bg,
+          surfaceTint: Colors.transparent,
+          surfaceContainer: bg,
+          surfaceContainerLow: bg,
+          surfaceContainerHigh: bg,
+          surfaceContainerHighest: bg,
         ),
       );
 
