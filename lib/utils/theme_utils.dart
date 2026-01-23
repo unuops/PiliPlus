@@ -57,21 +57,7 @@ abstract final class ThemeUtils {
         ),
       ),
       navigationBarTheme: NavigationBarThemeData(
-        backgroundColor: colorScheme.surface,
-        surfaceTintColor: Colors.transparent,
-        indicatorColor: colorScheme.primary.withOpacity(0.12),
-        labelTextStyle: WidgetStateProperty.all(
-          TextStyle(color: colorScheme.onSurface),
-        ),
-        iconTheme: WidgetStateProperty.all(
-          IconThemeData(color: colorScheme.onSurface),
-        ),
-      ),
-      bottomNavigationBarTheme: BottomNavigationBarThemeData(
-        backgroundColor: colorScheme.surface,
-        selectedItemColor: colorScheme.primary,
-        unselectedItemColor: colorScheme.onSurfaceVariant,
-        type: BottomNavigationBarType.fixed,
+        surfaceTintColor: isDynamic ? colorScheme.onSurfaceVariant : null,
       ),
       snackBarTheme: SnackBarThemeData(
         actionTextColor: colorScheme.primary,
@@ -82,13 +68,13 @@ abstract final class ThemeUtils {
         elevation: 20,
       ),
       popupMenuTheme: PopupMenuThemeData(
-        surfaceTintColor: Colors.transparent,
+        surfaceTintColor: isDynamic ? colorScheme.onSurfaceVariant : null,
       ),
       cardTheme: CardThemeData(
         elevation: 1,
         margin: EdgeInsets.zero,
         shadowColor: Colors.transparent,
-        surfaceTintColor: Colors.transparent,
+        surfaceTintColor: isDynamic ? colorScheme.onSurfaceVariant : null,
       ),
       progressIndicatorTheme: ProgressIndicatorThemeData(
         year2023: false,
@@ -124,8 +110,8 @@ abstract final class ThemeUtils {
         selectionHandleColor: colorScheme.primary,
       ),
       switchTheme: const SwitchThemeData(
-        thumbIcon: WidgetStateProperty.fromMap(
-          {
+        thumbIcon: WidgetStateProperty<Icon?>.fromMap(
+          <WidgetStatesConstraint, Icon?>{
             WidgetState.selected: Icon(Icons.done),
             WidgetState.any: null,
           },
@@ -140,41 +126,41 @@ abstract final class ThemeUtils {
 
     if (isDark) {
       const darkBg = Color(0xFF17181A);
+
       themeData = themeData.copyWith(
-        scaffoldBackgroundColor: darkBg,
-        appBarTheme: themeData.appBarTheme.copyWith(
+        navigationBarTheme: NavigationBarThemeData(
           backgroundColor: darkBg,
-        ),
-        cardTheme: themeData.cardTheme.copyWith(
-          color: darkBg,
-        ),
-        dialogTheme: themeData.dialogTheme.copyWith(
-          backgroundColor: darkBg,
-        ),
-        bottomSheetTheme: themeData.bottomSheetTheme.copyWith(
-          backgroundColor: darkBg,
-        ),
-        navigationBarTheme: themeData.navigationBarTheme.copyWith(
-          backgroundColor: darkBg,
-        ),
-        bottomNavigationBarTheme:
-            themeData.bottomNavigationBarTheme.copyWith(
-          backgroundColor: darkBg,
-        ),
-        navigationRailTheme:
-            themeData.navigationRailTheme.copyWith(
-          backgroundColor: darkBg,
-        ),
-        colorScheme: themeData.colorScheme.copyWith(
-          surface: darkBg,
-          surfaceTint: Colors.transparent,
-          surfaceContainer: darkBg,
-          surfaceContainerHigh: darkBg,
-          surfaceContainerHighest: darkBg,
-          surfaceContainerLow: darkBg,
-          surfaceContainerLowest: darkBg,
+          surfaceTintColor: Colors.transparent,
+          indicatorColor:
+              themeData.colorScheme.primary.withOpacity(0.15),
+          labelTextStyle: WidgetStateProperty.resolveWith(
+            (states) {
+              if (states.contains(WidgetState.selected)) {
+                return TextStyle(
+                  color: themeData.colorScheme.primary,
+                  fontWeight: FontWeight.w500,
+                );
+              }
+              return const TextStyle(
+                color: Color(0xFF9E9E9E),
+              );
+            },
+          ),
+          iconTheme: WidgetStateProperty.resolveWith(
+            (states) {
+              if (states.contains(WidgetState.selected)) {
+                return IconThemeData(
+                  color: themeData.colorScheme.primary,
+                );
+              }
+              return const IconThemeData(
+                color: Color(0xFF9E9E9E),
+              );
+            },
+          ),
         ),
       );
+
       if (Pref.darkVideoPage) {
         MyApp.darkThemeData = themeData;
       }
