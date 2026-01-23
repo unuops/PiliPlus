@@ -15,13 +15,14 @@ abstract final class ThemeUtils {
       -1,
       FontWeight.values.length - 1,
     );
-    final fontWeight = appFontWeight == -1
-        ? null
-        : FontWeight.values[appFontWeight];
-    late final textStyle = TextStyle(fontWeight: fontWeight);
+    final fontWeight =
+        appFontWeight == -1 ? null : FontWeight.values[appFontWeight];
+    final textStyle = TextStyle(fontWeight: fontWeight);
+
     ThemeData themeData = ThemeData(
-      colorScheme: colorScheme,
       useMaterial3: true,
+      colorScheme: colorScheme,
+      scaffoldBackgroundColor: colorScheme.surface,
       textTheme: fontWeight == null
           ? null
           : TextTheme(
@@ -41,9 +42,8 @@ abstract final class ThemeUtils {
               labelMedium: textStyle,
               labelSmall: textStyle,
             ),
-      tabBarTheme: fontWeight == null
-          ? null
-          : TabBarThemeData(labelStyle: textStyle),
+      tabBarTheme:
+          fontWeight == null ? null : TabBarThemeData(labelStyle: textStyle),
       appBarTheme: AppBarTheme(
         elevation: 0,
         titleSpacing: 0,
@@ -57,30 +57,40 @@ abstract final class ThemeUtils {
         ),
       ),
       navigationBarTheme: NavigationBarThemeData(
-        surfaceTintColor: isDynamic ? colorScheme.onSurfaceVariant : null,
+        backgroundColor: colorScheme.surface,
+        surfaceTintColor: Colors.transparent,
+        indicatorColor: colorScheme.primary.withOpacity(0.12),
+        labelTextStyle: WidgetStateProperty.all(
+          TextStyle(color: colorScheme.onSurface),
+        ),
+        iconTheme: WidgetStateProperty.all(
+          IconThemeData(color: colorScheme.onSurface),
+        ),
+      ),
+      bottomNavigationBarTheme: BottomNavigationBarThemeData(
+        backgroundColor: colorScheme.surface,
+        selectedItemColor: colorScheme.primary,
+        unselectedItemColor: colorScheme.onSurfaceVariant,
+        type: BottomNavigationBarType.fixed,
       ),
       snackBarTheme: SnackBarThemeData(
         actionTextColor: colorScheme.primary,
         backgroundColor: colorScheme.secondaryContainer,
         closeIconColor: colorScheme.secondary,
-        contentTextStyle: TextStyle(color: colorScheme.onSecondaryContainer),
+        contentTextStyle:
+            TextStyle(color: colorScheme.onSecondaryContainer),
         elevation: 20,
       ),
       popupMenuTheme: PopupMenuThemeData(
-        surfaceTintColor: isDynamic ? colorScheme.onSurfaceVariant : null,
+        surfaceTintColor: Colors.transparent,
       ),
       cardTheme: CardThemeData(
         elevation: 1,
         margin: EdgeInsets.zero,
-        surfaceTintColor: isDynamic
-            ? colorScheme.onSurfaceVariant
-            : isDark
-            ? colorScheme.onSurfaceVariant
-            : null,
         shadowColor: Colors.transparent,
+        surfaceTintColor: Colors.transparent,
       ),
       progressIndicatorTheme: ProgressIndicatorThemeData(
-        // ignore: deprecated_member_use
         year2023: false,
         refreshBackgroundColor: colorScheme.onSecondary,
       ),
@@ -99,7 +109,6 @@ abstract final class ThemeUtils {
           borderRadius: StyleString.bottomSheetRadius,
         ),
       ),
-      // ignore: deprecated_member_use
       sliderTheme: const SliderThemeData(year2023: false),
       tooltipTheme: TooltipThemeData(
         textStyle: const TextStyle(
@@ -115,8 +124,8 @@ abstract final class ThemeUtils {
         selectionHandleColor: colorScheme.primary,
       ),
       switchTheme: const SwitchThemeData(
-        thumbIcon: WidgetStateProperty<Icon?>.fromMap(
-          <WidgetStatesConstraint, Icon?>{
+        thumbIcon: WidgetStateProperty.fromMap(
+          {
             WidgetState.selected: Icon(Icons.done),
             WidgetState.any: null,
           },
@@ -128,65 +137,49 @@ abstract final class ThemeUtils {
         },
       ),
     );
+
     if (isDark) {
-      if (Pref.isPureBlackTheme) {
-        themeData = darkenTheme(themeData);
-      }
+      const darkBg = Color(0xFF17181A);
+      themeData = themeData.copyWith(
+        scaffoldBackgroundColor: darkBg,
+        appBarTheme: themeData.appBarTheme.copyWith(
+          backgroundColor: darkBg,
+        ),
+        cardTheme: themeData.cardTheme.copyWith(
+          color: darkBg,
+        ),
+        dialogTheme: themeData.dialogTheme.copyWith(
+          backgroundColor: darkBg,
+        ),
+        bottomSheetTheme: themeData.bottomSheetTheme.copyWith(
+          backgroundColor: darkBg,
+        ),
+        navigationBarTheme: themeData.navigationBarTheme.copyWith(
+          backgroundColor: darkBg,
+        ),
+        bottomNavigationBarTheme:
+            themeData.bottomNavigationBarTheme.copyWith(
+          backgroundColor: darkBg,
+        ),
+        navigationRailTheme:
+            themeData.navigationRailTheme.copyWith(
+          backgroundColor: darkBg,
+        ),
+        colorScheme: themeData.colorScheme.copyWith(
+          surface: darkBg,
+          surfaceTint: Colors.transparent,
+          surfaceContainer: darkBg,
+          surfaceContainerHigh: darkBg,
+          surfaceContainerHighest: darkBg,
+          surfaceContainerLow: darkBg,
+          surfaceContainerLowest: darkBg,
+        ),
+      );
       if (Pref.darkVideoPage) {
         MyApp.darkThemeData = themeData;
       }
     }
-    return themeData;
-  }
 
-  static ThemeData darkenTheme(ThemeData themeData) {
-    final colorScheme = themeData.colorScheme;
-    final color = colorScheme.surfaceContainerHighest.darken(0.7);
-    return themeData.copyWith(
-      scaffoldBackgroundColor: Colors.black,
-      appBarTheme: themeData.appBarTheme.copyWith(
-        backgroundColor: Colors.black,
-      ),
-      cardTheme: themeData.cardTheme.copyWith(
-        color: Colors.black,
-      ),
-      dialogTheme: themeData.dialogTheme.copyWith(
-        backgroundColor: color,
-      ),
-      bottomSheetTheme: themeData.bottomSheetTheme.copyWith(
-        backgroundColor: color,
-      ),
-      bottomNavigationBarTheme: themeData.bottomNavigationBarTheme.copyWith(
-        backgroundColor: color,
-      ),
-      navigationBarTheme: themeData.navigationBarTheme.copyWith(
-        backgroundColor: color,
-      ),
-      navigationRailTheme: themeData.navigationRailTheme.copyWith(
-        backgroundColor: Colors.black,
-      ),
-      colorScheme: colorScheme.copyWith(
-        primary: colorScheme.primary.darken(0.1),
-        onPrimary: colorScheme.onPrimary.darken(0.1),
-        primaryContainer: colorScheme.primaryContainer.darken(0.1),
-        onPrimaryContainer: colorScheme.onPrimaryContainer.darken(0.1),
-        inversePrimary: colorScheme.inversePrimary.darken(0.1),
-        secondary: colorScheme.secondary.darken(0.1),
-        onSecondary: colorScheme.onSecondary.darken(0.1),
-        secondaryContainer: colorScheme.secondaryContainer.darken(0.1),
-        onSecondaryContainer: colorScheme.onSecondaryContainer.darken(0.1),
-        error: colorScheme.error.darken(0.1),
-        surface: Colors.black,
-        onSurface: colorScheme.onSurface.darken(0.15),
-        surfaceTint: colorScheme.surfaceTint.darken(),
-        inverseSurface: colorScheme.inverseSurface.darken(),
-        onInverseSurface: colorScheme.onInverseSurface.darken(),
-        surfaceContainer: colorScheme.surfaceContainer.darken(),
-        surfaceContainerHigh: colorScheme.surfaceContainerHigh.darken(),
-        surfaceContainerHighest: colorScheme.surfaceContainerHighest.darken(
-          0.4,
-        ),
-      ),
-    );
+    return themeData;
   }
 }
