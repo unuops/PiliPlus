@@ -7,7 +7,6 @@ import 'package:PiliPlus/common/widgets/custom_toast.dart';
 import 'package:PiliPlus/common/widgets/scale_app.dart';
 import 'package:PiliPlus/common/widgets/scroll_behavior.dart';
 import 'package:PiliPlus/http/init.dart';
-import 'package:PiliPlus/models/common/theme/theme_color_type.dart';
 import 'package:PiliPlus/router/app_pages.dart';
 import 'package:PiliPlus/services/account_service.dart';
 import 'package:PiliPlus/services/download/download_service.dart';
@@ -28,7 +27,7 @@ import 'package:PiliPlus/utils/storage_pref.dart';
 import 'package:PiliPlus/utils/theme_utils.dart';
 import 'package:PiliPlus/utils/utils.dart';
 import 'package:catcher_2/catcher_2.dart';
-import 'package:dynamic_color/dynamic_color.dart';
+import 'package:flex_seed_scheme/flex_seed_scheme.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -179,10 +178,6 @@ void main() async {
     });
   }
 
-  if (Pref.dynamicColor) {
-    await MyApp.initPlatformState();
-  }
-
   if (Pref.enableLog) {
     // 异常捕获 logo记录
     final customParameters = {
@@ -226,9 +221,30 @@ void main() async {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  static ColorScheme? _light, _dark;
-
   static ThemeData? darkThemeData;
+  static const Color _brandSeedColor = Color(0xFF5CB67B);
+  static const Color _darkSurfaceColor = Color(0xFF1E1F22);
+  static const Color _darkBackgroundColor = Color(0xFF17181A);
+  static const FlexSchemeVariant _schemeVariant =
+      FlexSchemeVariant.material3Legacy;
+
+  static ColorScheme _buildLightScheme() =>
+      _brandSeedColor.asColorSchemeSeed(_schemeVariant, .light);
+
+  static ColorScheme _buildDarkScheme() {
+    final base = _brandSeedColor.asColorSchemeSeed(_schemeVariant, .dark);
+    return base.copyWith(
+      surface: _darkSurfaceColor,
+      surfaceContainerLowest: _darkSurfaceColor,
+      surfaceContainerLow: _darkSurfaceColor,
+      surfaceContainer: _darkSurfaceColor,
+      surfaceContainerHigh: _darkSurfaceColor,
+      surfaceContainerHighest: _darkSurfaceColor,
+      surfaceVariant: _darkSurfaceColor,
+      surfaceTint: _darkSurfaceColor,
+      background: _darkBackgroundColor,
+    );
+  }
 
   static void _onBack() {
     if (SmartDialog.checkExist()) {
@@ -252,23 +268,18 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final dynamicColor = Pref.dynamicColor && _light != null && _dark != null;
-    late final brandColor = colorThemeTypes[Pref.customColor].color;
-    late final variant = Pref.schemeVariant;
+    final lightScheme = _buildLightScheme();
+    final darkScheme = _buildDarkScheme();
     return GetMaterialApp(
       title: Constants.appName,
       theme: ThemeUtils.getThemeData(
-        colorScheme: dynamicColor
-            ? _light!
-            : brandColor.asColorSchemeSeed(variant, .light),
-        isDynamic: dynamicColor,
+        colorScheme: lightScheme,
+        isDynamic: false,
       ),
       darkTheme: ThemeUtils.getThemeData(
         isDark: true,
-        colorScheme: dynamicColor
-            ? _dark!
-            : brandColor.asColorSchemeSeed(variant, .dark),
-        isDynamic: dynamicColor,
+        colorScheme: darkScheme,
+        isDynamic: false,
       ),
       themeMode: Pref.themeMode,
       localizationsDelegates: const [
@@ -328,50 +339,6 @@ class MyApp extends StatelessWidget {
     return child;
   }
 
-  /// from [DynamicColorBuilderState.initPlatformState]
-  static Future<bool> initPlatformState() async {
-    if (_light != null || _dark != null) return true;
-    // Platform messages may fail, so we use a try/catch PlatformException.
-    try {
-      final corePalette = await DynamicColorPlugin.getCorePalette();
-
-      if (corePalette != null) {
-        if (kDebugMode) {
-          debugPrint('dynamic_color: Core palette detected.');
-        }
-        _light = corePalette.toColorScheme();
-        _dark = corePalette.toColorScheme(brightness: Brightness.dark);
-        return true;
-      }
-    } on PlatformException {
-      if (kDebugMode) {
-        debugPrint('dynamic_color: Failed to obtain core palette.');
-      }
-    }
-
-    try {
-      final Color? accentColor = await DynamicColorPlugin.getAccentColor();
-
-      if (accentColor != null) {
-        if (kDebugMode) {
-          debugPrint('dynamic_color: Accent color detected.');
-        }
-        final variant = Pref.schemeVariant;
-        _light = accentColor.asColorSchemeSeed(variant, .light);
-        _dark = accentColor.asColorSchemeSeed(variant, .dark);
-        return true;
-      }
-    } on PlatformException {
-      if (kDebugMode) {
-        debugPrint('dynamic_color: Failed to obtain accent color.');
-      }
-    }
-    if (kDebugMode) {
-      debugPrint('dynamic_color: Dynamic color not detected on this device.');
-    }
-    GStorage.setting.put(SettingBoxKey.dynamicColor, false);
-    return false;
-  }
 }
 
 class _CustomHttpOverrides extends HttpOverrides {
